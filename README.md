@@ -52,8 +52,9 @@ Everything here was found the same way:
 | [rds](rds/) | Radio Data System | 1187.5 bps BPSK on the 57 kHz subcarrier (= 19 kHz × 3; bitrate = 57 k/48) | ✅ measured |
 | [nrsc5-fm-hybrid](nrsc5-fm-hybrid/) | HD Radio (FM IBOC) | OFDM: 2048-FFT @ 744.1875 kHz, 363.373 Hz spacing, tapered 112-sample guard, reference subcarriers every 19th carrying 32-bit DBPSK | ✅ measured |
 | [rs41-radiosonde](rs41-radiosonde/) | Vaisala RS41 weather balloon | 4800 Bd GFSK, 64-bit whitened sync, LFSR whitening, RS(255,231) over GF(256)/0x11D | ✅ measured |
-| [adsb-1090](adsb-1090/) | ADS-B / Mode S | 1090 MHz PPM, 8 µs preamble (pulses at 0, 1, 3.5, 4.5 µs), 112-bit extended squitter, CRC-24 | 🕓 grid documented, verification capture pending |
+| [adsb-1090](adsb-1090/) | ADS-B / Mode S | 1090 MHz PPM, 8 µs preamble (pulses at 0, 1, 3.5, 4.5 µs), 112-bit extended squitter, CRC-24 | ✅ measured — 31 CRC-verified frames on rabbit ears |
 | [meteor-lrpt](meteor-lrpt/) | Meteor-M LRPT weather satellite | 72 kSym/s QPSK, K=7 r=1/2 Viterbi, CCSDS frames behind 0x1ACFFC1D ASM, RS(255,223) | ✅ measured |
+| [wwv-time](wwv-time/) | WWV / NIST time (10 MHz) | 1000 Hz ticks, 100 Hz BCD time code, 500/600 Hz minute tones — every element cesium-derived | ✅ measured (tone grid; per-second fold honest-inconclusive under evening QSB) |
 
 ## Why publish this
 

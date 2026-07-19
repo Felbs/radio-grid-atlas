@@ -20,18 +20,17 @@ CRC_POLY = 0xFFF409
 
 
 def crc24(bits112):
+    """Mode S parity: shift-register division of the whole frame by the
+    FULL 25-bit generator 0x1FFF409 — the x^24 term is not optional.
+    (Writing the generator as '0xFFF409' and hand-aligning shifts cost
+    this script two wrong versions; the leading term is what cancels
+    the bit you aligned to. Remainder 0 == valid DF17/18.)"""
     reg = 0
-    for b in bits112[:88]:
-        reg = ((reg << 1) | int(b)) & 0xFFFFFF
-        if reg & 0x800000:
-            reg ^= CRC_POLY & 0x7FFFFF
-    # standard Mode S: remainder over the first 88 bits vs parity field
-    r = 0
-    data = int("".join(str(int(b)) for b in bits112), 2)
-    for i in range(112 - 24):
-        if data & (1 << (111 - i)):
-            data ^= CRC_POLY << (88 - 1 - i)
-    return (data & 0xFFFFFF) == 0
+    for b in bits112:
+        reg = (reg << 1) | int(b)
+        if reg & (1 << 24):
+            reg ^= 0x1FFF409
+    return (reg & 0xFFFFFF) == 0
 
 
 def main():
@@ -59,24 +58,58 @@ def main():
     for t0 in (0.0, 1.0, 3.5, 4.5):
         tpl[int(t0 * spb):int(t0 * spb) + hp] = 1.0
     corr = np.correlate(env - env.mean(), tpl, mode="valid")
-    th = corr.mean() + 6 * corr.std()
-    cand = np.where(corr > th)[0]
-    cand = cand[np.insert(np.diff(cand) > 2 * spb, 0, True)]
+    # robust threshold: median + k*MAD, NOT mean + k*std — on a short
+    # or busy capture the frames themselves inflate the std until the
+    # threshold climbs above its own peaks (found via synthetic TX)
+    med = np.median(corr)
+    mad = np.median(np.abs(corr - med)) + 1e-9
+    th = med + 12 * mad
+    cand_all = np.where(corr > th)[0]
+    cand = []
+    if len(cand_all):
+        # keep each cluster's correlation ARGMAX, not its first sample —
+        # a noise shoulder can start a cluster microseconds before the
+        # true peak and push the frame outside the alignment scan
+        # (found by differential debug against a reference decoder:
+        # slicer read 112/112 at truth, detector never offered truth)
+        splits = np.where(np.diff(cand_all) > 2 * spb)[0] + 1
+        for grp in np.split(cand_all, splits):
+            cand.append(int(grp[np.argmax(corr[grp])]))
+    cand = np.array(cand, dtype=np.int64)
+
+    # PPM slicing that works at ANY sample rate: integrate envelope
+    # energy over each half-microsecond window via a cumulative sum
+    # with fractional edges (at 2.4 MS/s a half-bit is 1.2 samples —
+    # single-sample slicing straddles edges and fails every CRC).
+    F = np.concatenate(([0.0], np.cumsum(env, dtype=np.float64)))
+
+    def F_at(pos):
+        i = pos.astype(np.int64)
+        fr = pos - i
+        return F[i] * (1 - fr) + F[i + 1] * fr
+
+    def window_energy(a, b):
+        return F_at(b) - F_at(a)
 
     ok = 0
     keep = None
+    bit_starts = np.arange(112) * spb
+    # correlation peaks land within ~1 us of true preamble start; scan
+    # sub-microsecond alignments and let the CRC pick the right one
+    subs = np.arange(-1.0, 1.01, 0.25) * spb
     for c in cand[:20000]:
-        s0 = c + int(8 * spb)
-        need = int(112 * spb) + hp
-        if s0 + need > len(env):
+        if c + 10 * spb + 113 * spb > len(env):
             break
-        first = env[s0 + (np.arange(112) * spb).astype(int)]
-        second = env[s0 + (np.arange(112) * spb).astype(int) + hp]
-        bits = (first > second).astype(np.int8)
-        if crc24(bits):
-            ok += 1
-            if keep is None:
-                keep = (c, bits)
+        for off in subs:
+            a = c + off + 8 * spb + bit_starts
+            e1 = window_energy(a, a + spb / 2)
+            e2 = window_energy(a + spb / 2, a + spb)
+            bits = (e1 > e2).astype(np.int8)
+            if crc24(bits):
+                ok += 1
+                if keep is None:
+                    keep = (int(c + off), bits)
+                break
     print(f"preamble candidates: {len(cand)}   CRC-24 verified frames: {ok}")
     if keep is None:
         print("no verified frames — busier sky or better antenna needed")

@@ -16,22 +16,52 @@ equalizer, just a microsecond ruler.
 | Integrity | **CRC-24** (poly 0xFFF409) | doubles as the addressing mechanism |
 | Position | Compact Position Reporting (CPR), even/odd frame pairs | 17-bit lat/lon halves that interlock |
 
-## Status: grid documented, atlas verification capture pending
+## What we measured (30 s, 9:45 PM Sunday, RSPdx + rabbit ears indoors)
 
-Our ADS-B receiver ([aeroTuna](https://github.com/Felbs/aeroTuna))
-decodes live traffic daily — including through a confidence-guided
-"rescue" pass that recovers 2.7× more frames than hard slicing at
-range. It decodes live rather than from files, so tonight the SDR is
-busy with better things (an HD station that just decoded for the
-first time ever) and this entry ships without its `figures/`.
-`measure.py` is ready: point it at a 30 s capture at 2.4 MS/s centered
-on 1090 MHz and it will find preambles by matched correlation, verify
-CRC-24 on the hits, and plot the pulse timeline of a real squitter.
+```
+preamble candidates: 15831   CRC-24 verified frames: 31
+first verified frame: DF=17 ICAO AD574F
+```
 
-The measurement to expect: preamble pulse spacing 0/1.0/3.5/4.5 µs to
-the sample, and a CRC pass rate that tells you honestly how many of
-your "detections" are real (at 1090 MHz, impulse noise fakes preambles
-constantly — the CRC is the referee).
+Thirty-one CRC-clean extended squitters from seven aircraft in half a
+minute, on *rabbit ears*. The candidate-to-verified ratio (15831 → 31)
+is the honest part: at 1090 MHz, impulse noise fakes preambles
+constantly, and the CRC is the only referee that matters.
+
+![a verified squitter](figures/adsb.png)
+
+## Four lessons this entry cost (all now baked into `measure.py`)
+
+1. **Never capture pulsed signals with AGC on.** The AGC rides gain up
+   between bursts, then the bursts clip. Our first capture had
+   spectacular-looking pulses and zero decodable frames.
+2. **The CRC generator's leading term is not optional.** Mode S parity
+   uses the 25-bit generator **0x1FFF409**; writing it as "0xFFF409"
+   and hand-aligning shifts produces division that never reduces —
+   and a synthetic test frame built with the same broken constant
+   *passes*, because self-consistency is not correctness. Constants
+   must be validated against live signal or an independent decoder.
+3. **Threshold on median+MAD, not mean+σ** — on a short capture the
+   frames themselves inflate the σ until the threshold climbs above
+   its own peaks.
+4. **Take each correlation cluster's argmax, not its first sample** —
+   a noise shoulder can open the cluster microseconds early and push
+   the true preamble outside your alignment scan.
+
+The debugging method is the story: differential testing against a
+reference decoder ([aeroTuna](https://github.com/Felbs/aeroTuna),
+which pulls 35/30 s from the same capture with its confidence-guided
+rescue) localized each bug in minutes — slicer perfect at truth
+(112/112 bits), so suspect the detector; detector fine, so suspect
+the constant.
+
+## Reproduce it
+
+```
+python measure.py --iq capture.cs16 --fs 2000000
+```
+30 s at 1090 MHz, ANY antenna (really — rabbit ears log airliners),
+**fixed gain, AGC off**, generous RF gain (the pulses are brief).
 
 ## Reproduce it
 
