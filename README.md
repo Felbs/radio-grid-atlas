@@ -58,6 +58,7 @@ Everything here was found the same way:
 | [ft8-hf](ft8-hf/) | FT8 (40 m amateur) | 15 s slots aligned to ABSOLUTE UTC, 79 × 0.16 s symbols, 8-GFSK with spacing = baud = 6.25 Hz | ✅ measured — the band folds at the wall clock, 6.8 dB |
 | [wwvb-60khz](wwvb-60khz/) | WWVB / NIST time (60 kHz) | pulse-width AM at 1 bit/s: carrier drops 0.2/0.5/0.8 s for 0/1/marker, markers every 10 s | ✅ measured — three pulse islands, marker comb R = 1.000 |
 | [flex-pager](flex-pager/) | FLEX paging (929 MHz) | 1.875 s frame comb (240 s / 128), 4-FSK at ±1600/±4800 Hz, 3200 sym/s | ✅ measured — went in hunting POCSAG, the band said FLEX |
+| [gps-l1-ca](gps-l1-ca/) | GPS L1 C/A | 1023-chip Gold codes @ 1.023 Mchip/s (1 ms epochs), 50 bps nav bits, code/carrier locked 1:1540 | ✅ measured — 4 SVs pulled from 20 dB below the noise floor, on rabbit ears |
 
 ## Why publish this
 
