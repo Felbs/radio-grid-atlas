@@ -59,6 +59,7 @@ Everything here was found the same way:
 | [wwvb-60khz](wwvb-60khz/) | WWVB / NIST time (60 kHz) | pulse-width AM at 1 bit/s: carrier drops 0.2/0.5/0.8 s for 0/1/marker, markers every 10 s | ✅ measured — three pulse islands, marker comb R = 1.000 |
 | [flex-pager](flex-pager/) | FLEX paging (929 MHz) | 1.875 s frame comb (240 s / 128), 4-FSK at ±1600/±4800 Hz, 3200 sym/s | ✅ measured — went in hunting POCSAG, the band said FLEX |
 | [gps-l1-ca](gps-l1-ca/) | GPS L1 C/A | 1023-chip Gold codes @ 1.023 Mchip/s (1 ms epochs), 50 bps nav bits, code/carrier locked 1:1540 | ✅ measured — 4 SVs pulled from 20 dB below the noise floor, on rabbit ears |
+| [ais-vhf](ais-vhf/) | AIS marine (161.975/162.025 MHz) | 9600 bps GMSK, NRZI + HDLC 0x7E flags, SOTDMA 26.67 ms slot comb, CRC-16/X.25 | ✅ measured — 179 CRC-verified frames; slot comb aligned across 3 transmitters to 68 µs |
 
 ## Why publish this
 
