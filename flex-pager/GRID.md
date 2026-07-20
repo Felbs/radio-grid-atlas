@@ -81,3 +81,33 @@ Tune the middle of your local 929–932 MHz paging allocation (int16
 interleaved IQ), a few minutes, any antenna — paging transmitters are
 tens of kilowatts of ERP built to punch into basements. If your burst
 starts fold at 1.875 s, you've found FLEX's heartbeat.
+
+## Addendum: the comb is nailed to the GPS clock (timed capture)
+
+Yesterday we showed the 1.875 s comb never moves. Today we asked the
+harder question: is it nailed to the *wall clock*? 150 s re-shot with a
+timestamp calibrated by decoding GPS itself off the air (stamp bias
++0.770 s ± 20 ms), and this time we decoded the Frame Info Word —
+BCH(31,21) with generator x^10+x^9+x^8+x^6+x^5+x^3+1, recovered blind
+by brute-forcing all 512 degree-10 polynomials against the bits.
+
+```
+45 FIWs decoded, every one clean BCH (0 corrected bits), checksum 54/54
+cycle/frame numbers count through a rollover: ... 10/126, 10/127, 11/0 ...
+frame comb vs absolute time:  0.03 ms rms spread over 150 s
+frame 0 / cycle 0 origin:     UTC hh:00:00 - 18.006 s
+                            = GPS hh:00:00 - 6 ms   (cal ± 20 ms)
+decoded frame numbers vs prediction:  GPS clock 45/45 — UTC clock 0/45
+```
+
+The grid is absolute — but it ticks on **GPS time**, 18 leap seconds
+ahead of UTC. Frame k of cycle c starts at GPS hh:mm:00 + 1.875k, mm
+divisible by 4, and the network has never subtracted a leap second.
+Phase alone could not have said this: a 744 ms constant offset is just
+a constant. The frame *numbers* pin it — 10 frames plus 744 ms is
+exactly 18.000 s. (Transmitters key up ~99 ms of preamble before their
+first frame, so burst onsets measure early; A-word times are the
+ruler.) One market, one channel, one afternoon; our SDR crystal came
+out −0.8 ppm against their GPS reference.
+
+![the comb vs the GPS clock](figures/flex_wallclock.png)
