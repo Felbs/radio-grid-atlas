@@ -61,6 +61,7 @@ Everything here was found the same way:
 | [gps-l1-ca](gps-l1-ca/) | GPS L1 C/A | 1023-chip Gold codes @ 1.023 Mchip/s (1 ms epochs), 50 bps nav bits, code/carrier locked 1:1540 | ✅ measured — 4 SVs pulled from 20 dB below the noise floor, on rabbit ears |
 | [ais-vhf](ais-vhf/) | AIS marine (161.975/162.025 MHz) | 9600 bps GMSK, NRZI + HDLC 0x7E flags, SOTDMA 26.67 ms slot comb, CRC-16/X.25 | ✅ measured — 179 CRC-verified frames; slot comb aligned across 3 transmitters to 68 µs |
 | [hdam-iboc](hdam-iboc/) | HD Radio (AM all-digital, 820 kHz) | OFDM: 181.6864 Hz spacing = 172.265625 sym/s × 270/256, BPSK refs at ±181.7 Hz, 1.48607 s L1 frames | ✅ measured — block sync 90%, psmi=2 says all-digital in the broadcast's own bits |
+| [vor-nav](vor-nav/) | VOR aviation beacons (108–118 MHz) | 30 Hz AM + 9960 Hz subcarrier FM'd ±480 Hz at 30 Hz; fsub/f30 = 332 exactly; phase difference = your bearing | ✅ measured — ratio 331.999 ± 0.002 on two stations; bearing stable to 2° rms (value withheld — it locates the receiver) |
 
 ## Why publish this
 
