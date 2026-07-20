@@ -55,6 +55,7 @@ Everything here was found the same way:
 | [adsb-1090](adsb-1090/) | ADS-B / Mode S | 1090 MHz PPM, 8 µs preamble (pulses at 0, 1, 3.5, 4.5 µs), 112-bit extended squitter, CRC-24 | ✅ measured — 31 CRC-verified frames on rabbit ears |
 | [meteor-lrpt](meteor-lrpt/) | Meteor-M LRPT weather satellite | 72 kSym/s QPSK, K=7 r=1/2 Viterbi, CCSDS frames behind 0x1ACFFC1D ASM, RS(255,223) | ✅ measured |
 | [wwv-time](wwv-time/) | WWV / NIST time (10 MHz) | 1000 Hz ticks, 100 Hz BCD time code, 500/600 Hz minute tones — every element cesium-derived | ✅ measured (tone grid; per-second fold honest-inconclusive under evening QSB) |
+| [ft8-hf](ft8-hf/) | FT8 (40 m amateur) | 15 s slots aligned to ABSOLUTE UTC, 79 × 0.16 s symbols, 8-GFSK with spacing = baud = 6.25 Hz | ✅ measured — the band folds at the wall clock, 6.8 dB |
 
 ## Why publish this
 
