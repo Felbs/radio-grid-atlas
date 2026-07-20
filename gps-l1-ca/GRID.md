@@ -152,3 +152,35 @@ Any antenna with any sky view is worth trying — the entire detection
 lives in the correlator, not the hardware. If your bars clear 2.5,
 check the code-phase drift against -f_d/1540: if they agree, you are
 watching an atomic clock in a 20,000 km orbit through a TV antenna.
+
+## Addendum: reading the clock
+
+This morning's honesty note said we did not decode the navigation
+message. That afternoon, on a fresh 120 s rabbit-ears capture, we did.
+
+A closed-loop tracker (half-chip DLL + Costas PLL, 1 ms prompts) held
+PRN 15 phase-locked for the full 118 s at ~37 dB-Hz. The 20 ms bit
+tent from the morning became exact: 100% of sign transitions land on
+one epoch boundary mod 20, and majority-voting each 20-epoch block
+produced **5,874 bits with zero 1 ms epochs dissenting** from their
+bit. In that stream the 8-bit TLM preamble `10001011` repeats every
+300 bits, and all 180 words of 18 consecutive subframes pass the
+IS-GPS-200 D29*/D30* parity chain (checker validated on a synthetic
+stream first — roundtrip, polarity flip, 100/100 single-bit errors).
+
+The HOW of the first subframe reads TOW 24406: this subframe began at
+second 146,430 of GPS week — Monday 16:40:30 GPS, 16:40:12 UTC after
+the 18 leap seconds. Subframe 1's week field says **380** — ten bits,
+so the receiver adds 2×1024 rollovers from context to get week 2428.
+Trust the field alone and today is 1987; that is the exact bug our
+AIS entry caught in a receiver living 1024 weeks in the past.
+
+Cross-check: the capture's own timestamp puts that subframe's arrival
+702.6 ms *before* broadcast — impossible, light doesn't run backwards.
+Two weaker satellites (PRN 5 and 23, ~26 dB-Hz, parity-clean through
+their own bit errors) land at −695.6 and −692.4 ms: a common bias with
+a ~10 ms spread. The spread is real differential satellite range; the
+bias means our recorder's "±tens of ms" sidecar stamp is actually
+~0.77 s early. Three atomic clocks in orbit, one vote: the satellites
+audit the ground station, never the other way around. No position was
+computed — we read the grid's time, and that is all.
