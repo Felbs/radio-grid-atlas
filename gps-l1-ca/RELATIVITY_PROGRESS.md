@@ -47,3 +47,13 @@ S4 0.55-0.78, sigma_phi 0.29-0.53 rad on PRN5/15/21 — dominated by INDOOR
 MULTIPATH (honest single-antenna caveat), and it closes the loop on the 4% BER
 mystery: deep amplitude fades at C/N0 40 = the bit corruption the majority vote
 had to defeat. Outdoor/patch antenna will separate true ionosphere from house.
+
+## fix.py — full GPS receiver (7/25 sprint): solver validated, gated on 4 birds
+Built fix.py: reuses relativity's decode → IS-GPS-200 ephemeris→ECEF (sat_ecef,
+Kepler + all harmonic corrections + earth-rotation) + ecef_to_llh + least-squares
+solve(). VALIDATED the orbit math: PRN15 → |r|=26,109 km = the GPS shell (radius
+only needs A,e,E; 3D direction needs subframe-3 omega/i0/Omega0 which a stronger/
+longer capture completes). BLOCKER for an actual position fix: need >=4 birds
+simultaneously; indoor capture = 2 (PRN5/21), navbits = 1 (PRN15). SOLUTION (user
+in-person): antenna at a window / $10 GPS patch antenna on bias-T → 8-12 birds →
+fix converges → GPSTuna repo. Everything upstream of "4 birds" is DONE and tested.
