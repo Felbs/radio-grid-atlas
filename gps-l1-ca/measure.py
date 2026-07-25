@@ -275,8 +275,11 @@ def main():
     ap.add_argument("--iq2", help="optional second capture (comparison panel)")
     ap.add_argument("--tle", help="celestrak gps-ops TLE file (optional)")
     ap.add_argument("--t0", default=None, help="capture start UTC ISO time")
-    ap.add_argument("--lat", type=float, default=38.0)
-    ap.add_argument("--lon", type=float, default=-78.5)
+    ap.add_argument("--lat", type=float, default=0.0,
+                help="observer latitude - ONLY needed for the optional --tle "
+                     "sky-check; left at 0 so no location ships in the repo")
+    ap.add_argument("--lon", type=float, default=0.0,
+                help="observer longitude - see --lat")
     ap.add_argument("--selftest", action="store_true")
     a = ap.parse_args()
 
