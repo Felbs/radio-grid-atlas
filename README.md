@@ -21,6 +21,16 @@ suburban rooftop). Every entry contains three things:
    captures**: annotated spectra, correlation spikes, constellations.
    Nothing simulated, nothing copied from a datasheet.
 
+
+## Instruments in this repo
+
+| tool | what it measures |
+|------|------------------|
+| `gps-l1-ca/relativity.py` | GPS relativistic time dilation from raw L1 IQ (wobble + SR/GR budget, 99.9% match) |
+| `gps-l1-ca/fix.py` | full GPS receiver: ephemeris -> ECEF satellite positions -> position solve |
+| `gps-l1-ca/scint.py` | ionospheric scintillation (S4 + phase) from GPS carrier tracking |
+| `doppler_wwv.py` | ionospheric Doppler in milli-Hertz from WWV's 10 MHz carrier |
+
 ## The method (works on any signal)
 
 Everything here was found the same way:
