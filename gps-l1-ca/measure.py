@@ -27,7 +27,7 @@ Usage:
         [--iq2 gps_l1_discone.cs16]   # second capture for the acq figure
         [--tle gps_ops.tle]           # celestrak gps-ops TLE file
         [--t0 "2026-07-20T12:14:27Z"] # capture start UTC (for TLE check)
-        [--lat 38.0 --lon -78.5]      # coarse observer point (100 km is fine)
+        [--lat <deg> --lon <deg>]     # optional, only for --tle sky-check
         [--selftest]                  # synthetic -20 dB proof, then exit
 
 Privacy note: the default lat/lon is a deliberately coarse central-
