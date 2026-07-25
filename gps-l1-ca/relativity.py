@@ -89,6 +89,29 @@ def clean_carrier(p):
     return p1 * np.exp(-1j * ref)
 
 
+def costas(p, bn=20.0, zeta=0.707):
+    """Classic 2nd-order Costas PLL on the 1 ms prompts (1 kHz update).
+    err = atan(Q/I) is BPSK-data-insensitive; the closed loop tracks the
+    phase wander that defeated every open-loop batch correction."""
+    dt = 1e-3
+    wn = bn / (zeta + 1 / (4 * zeta)) * 2  # ~ Bn -> wn
+    k1 = 2 * zeta * wn * dt
+    k2 = (wn * dt) ** 2
+    ph = 0.0
+    fr = 0.0
+    out = np.empty_like(p)
+    for k in range(len(p)):
+        v = p[k] * np.exp(-1j * ph)
+        out[k] = v
+        if abs(v.real) > 1e-12:
+            err = np.arctan(v.imag / v.real)
+        else:
+            err = 0.0
+        fr += k2 * err
+        ph += fr + k1 * err
+    return out
+
+
 def bit_sums(pc, tent_off):
     """20 ms complex bit sums on the tent grid."""
     p = pc[tent_off:]
@@ -345,7 +368,7 @@ def main():
     tent_off = int(np.argmax(tent))
     print(f"[rel] bit grid offset {tent_off} ms (tent max/min {tent.max()/max(tent.min(),1e-9):.2f})")
     p = prompt_stream(a.iq, fs, tr, 1.0, min(dur_s - 2.0, 118.0))
-    pc = clean_carrier(p)
+    pc = costas(clean_carrier(p))
     s, bits, conf = bit_sums(pc, tent_off)
     print(f"[rel] {len(bits)} nav bits, median |I/Q| confidence {conf:.1f}")
     pol, starts = find_grid(bits)
@@ -372,6 +395,52 @@ def main():
             if 1 <= sfid <= 5:
                 harvest.append((sfid, tow, words))
     print(f"[rel] union harvest: +{n_ok} clean words from global-stitch decode")
+    # ---- MAJORITY VOTE across subframe repeats (ephemeris repeats every 30 s;
+    # 4% BER -> ~0.5% after a 3-4 way vote; words 1-2 change per repeat (TOW)
+    # so they come from a clean instance, words 3-10 get voted).
+    anchors = {}
+    for k, i in enumerate(starts):
+        d29s, d30s = (b[i - 2], b[i - 1]) if i >= 2 else (0, 0)
+        w1 = b[i:i + 30]
+        ok, _ = parity_ok(w1, d29s, d30s)
+        d29s2, d30s2 = w1[28], w1[29]
+        ok2, d2 = parity_ok(b[i + 30:i + 60], d29s2, d30s2)
+        if ok2:
+            sf = ubits(d2, 20, 22)
+            if 1 <= sf <= 5:
+                anchors[k] = sf
+    if anchors:
+        k0, s0 = next(iter(anchors.items()))
+        consistent = all((s0 - 1 + (k - k0)) % 5 + 1 == s for k, s in anchors.items())
+        print(f"[rel] sfid anchors {anchors} cycle-consistent={consistent}")
+        groups = {}
+        for k, i in enumerate(starts):
+            sf = (s0 - 1 + (k - k0)) % 5 + 1
+            if i + 300 <= len(b):
+                groups.setdefault(sf, []).append(i)
+        for sf, idxs in sorted(groups.items()):
+            if sf > 3 or len(idxs) < 2:
+                continue
+            stack = np.stack([b[i:i + 300] for i in idxs])
+            voted = (stack.mean(axis=0) > 0.5).astype(np.int8)
+            inst = idxs[0] if k0 not in range(len(starts)) else idxs[0]
+            hyb = voted.copy()
+            hyb[:60] = b[inst:inst + 60]              # TLM+HOW from an instance
+            d29s, d30s = (b[inst - 2], b[inst - 1]) if inst >= 2 else (0, 0)
+            words = {}
+            nok = 0
+            for w in range(10):
+                word = hyb[w * 30:(w + 1) * 30]
+                ok, d = parity_ok(word, d29s, d30s)
+                if ok:
+                    words[w] = d
+                    nok += 1
+                d29s, d30s = word[28], word[29]
+            print(f"[rel] VOTE sfid{sf}: {len(idxs)} repeats -> {nok}/10 words clean")
+            if 1 in words:
+                harvest.append((sf, ubits(words[1], 1, 17), words))
+            else:
+                harvest.append((sf, 0, words))
     if not harvest:
         print("[rel] BLOCKER: no parity-clean HOW words")
         return 1

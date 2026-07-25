@@ -21,3 +21,13 @@ phase err = atan(Q/I) per prompt, 2nd-order loop (Bn~15Hz), run over full
 + RELATIVITY.md writer are DONE and waiting — they fire the moment e/sqrtA
 decode. Also: capture t0 known (meta json) → could cross-check decoded
 ephemeris against public broadcast ephemeris for that date (honesty check).
+
+## Update (morning, cont.): root cause FOUND — it's uniform ~4% BER
+Falsified: phase (3 fixes incl. Costas PLL: no change), code alignment (power
+flat 98-101dB all 120s, resid 0.59 samp), grid slip (127us, negligible).
+The tell: 26% word success == (0.96)^30 — a UNIFORM ~4% bit error rate.
+THE FIX: ephemeris repeats identically every 30 s -> we hold 3-4 copies of
+each subframe. Assign sfid cycle to the 18 grid starts (anchor from any clean
+HOW; sfid advances +1 mod 5 per 300 bits), BIT-WISE MAJORITY VOTE across
+same-sfid repeats, then parity-harvest the voted bits. 4% -> ~0.5% BER ->
+~86% words -> subframe 2 (e, sqrtA) should decode. Physics stage then fires.
