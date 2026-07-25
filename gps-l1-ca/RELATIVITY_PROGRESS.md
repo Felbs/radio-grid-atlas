@@ -31,3 +31,19 @@ each subframe. Assign sfid cycle to the 18 grid starts (anchor from any clean
 HOW; sfid advances +1 mod 5 per 300 bits), BIT-WISE MAJORITY VOTE across
 same-sfid repeats, then parity-harvest the voted bits. 4% -> ~0.5% BER ->
 ~86% words -> subframe 2 (e, sqrtA) should decode. Physics stage then fires.
+
+## Toward a full GPS receiver (user ask 7/25)
+Position fix needs: (1) 4+ tracked sats (our indoor capture had 1 strong —
+re-capture with antenna at window/roof), (2) full ephemeris terms (extend
+parser: Cuc/Cus/Crc/Crs/Cic/Cis, dn, OmegaDot, IDOT — layout known), (3)
+pseudoranges from TOW-tagged code phase, (4) least-squares (x,y,z,t) solve.
+All within current hardware. NEVER publish the computed position (dox).
+GEM en route: single-sat TIMING lock = software GPSDO — calibrate the RSPdx
+TCXO against PRN15's atomic clock; likely explains our 4% BER (TCXO wander)
+and upgrades EVERY project's frequency accuracy for free.
+
+## Scintillation instrument (scint.py, 7/25): first light
+S4 0.55-0.78, sigma_phi 0.29-0.53 rad on PRN5/15/21 — dominated by INDOOR
+MULTIPATH (honest single-antenna caveat), and it closes the loop on the 4% BER
+mystery: deep amplitude fades at C/N0 40 = the bit corruption the majority vote
+had to defeat. Outdoor/patch antenna will separate true ionosphere from house.
