@@ -81,7 +81,15 @@ def lsr_correction(l_deg, b_deg):
 def find_line(abs_freqs, spectrum, search_khz=500.0):
     """Locate the HI line near 1420.405 MHz as the largest deviation from 1.0
     (the frequency-switched baseline) within +/- search window. Returns
-    (f_peak_hz, amplitude, snr)."""
+    (f_peak_hz, amplitude, snr).
+
+    First-light caveat (Antenna B, no horn): with a 1420-deaf antenna the ratio
+    is pure receiver artifact - a switch-center residual plus narrow RSPdx spurs
+    (birdies) - and this simple finder reports those as a bogus 'line' whose
+    velocity flips sign between integrations. That is the fingerprint of NO real
+    signal, not a detection. Proper spur/baseline calibration is deferred until a
+    1420-capable antenna (horn) actually delivers sky - tuning artifact rejection
+    against a deaf antenna would just overfit noise."""
     m = np.abs(abs_freqs - F_HI) < search_khz * 1e3
     if not m.any():
         return None, 0.0, 0.0
