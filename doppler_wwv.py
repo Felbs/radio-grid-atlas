@@ -83,6 +83,7 @@ def selftest():
     iq = (np.exp(1j * phase) + 0.05 * (np.random.randn(len(t)) + 1j * np.random.randn(len(t)))).astype(np.complex64)
     o = carrier_offset(iq, fs)
     _, f = doppler_series(iq, fs, o)
+    f = f[np.isfinite(f)]
     f = f - np.median(f)
     amp = (f.max() - f.min()) / 2
     print(f"  recovered carrier offset {o:.1f} Hz (true 137)")
