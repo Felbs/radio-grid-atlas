@@ -51,7 +51,7 @@ def doppler_series(iq, fs, off, block_s=1.0):
     xf = lfilter(lp, 1.0, x)
     nb = int(block_s * fs)
     amp_all = np.abs(xf)
-    strong = np.percentile(amp_all, 60)          # carrier-present threshold
+    strong = 0.5 * np.median(amp_all)            # reject only genuine fades (< half median)
     freqs, times = [], []
     for b in range(0, len(xf) - nb, nb):
         seg = xf[b:b + nb]
