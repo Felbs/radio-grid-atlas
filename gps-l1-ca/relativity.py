@@ -258,20 +258,39 @@ def parse_harvest(harvest):
                 put("toc", ubits(W[7], 9, 24) * 16)
         elif sfid == 2:
             if 2 in W:
+                put("IODE2", ubits(W[2], 1, 8))
                 put("Crs", sbits(W[2], 9, 24) * 2 ** -5)
+            if 3 in W:
+                put("dn", sbits(W[3], 1, 16) * 2 ** -43 * np.pi)
             if 3 in W and 4 in W:
                 put("M0", cat(ubits(W[3], 17, 24), 8, ubits(W[4], 1, 24), 24, True) * 2 ** -31 * np.pi)
+            if 5 in W:
+                put("Cuc", sbits(W[5], 1, 16) * 2 ** -29)
             if 5 in W and 6 in W:
                 put("e", cat(ubits(W[5], 17, 24), 8, ubits(W[6], 1, 24), 24, False) * 2 ** -33)
+            if 7 in W:
+                put("Cus", sbits(W[7], 1, 16) * 2 ** -29)
             if 7 in W and 8 in W:
                 put("sqrtA", cat(ubits(W[7], 17, 24), 8, ubits(W[8], 1, 24), 24, False) * 2 ** -19)
             if 9 in W:
                 put("toe", ubits(W[9], 1, 16) * 16)
         elif sfid == 3:
+            if 2 in W:
+                put("Cic", sbits(W[2], 1, 16) * 2 ** -29)
+            if 2 in W and 3 in W:
+                put("Omega0", cat(ubits(W[2], 17, 24), 8, ubits(W[3], 1, 24), 24, True) * 2 ** -31 * np.pi)
+            if 4 in W:
+                put("Cis", sbits(W[4], 1, 16) * 2 ** -29)
             if 4 in W and 5 in W:
                 put("i0", cat(ubits(W[4], 17, 24), 8, ubits(W[5], 1, 24), 24, True) * 2 ** -31 * np.pi)
+            if 6 in W:
+                put("Crc", sbits(W[6], 1, 16) * 2 ** -5)
             if 6 in W and 7 in W:
                 put("omega", cat(ubits(W[6], 17, 24), 8, ubits(W[7], 1, 24), 24, True) * 2 ** -31 * np.pi)
+            if 8 in W:
+                put("OmegaDot", sbits(W[8], 1, 24) * 2 ** -43 * np.pi)
+            if 9 in W:
+                put("IDOT", sbits(W[9], 9, 22) * 2 ** -43 * np.pi)
     return eph
 
 
