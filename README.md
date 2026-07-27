@@ -27,7 +27,7 @@ suburban rooftop). Every entry contains three things:
 | tool | what it measures |
 |------|------------------|
 | `gps-l1-ca/relativity.py` | GPS relativistic time dilation from raw L1 IQ (wobble + SR/GR budget, 99.9% match) |
-| `gps-l1-ca/fix.py` | full GPS receiver: ephemeris -> ECEF satellite positions -> position solve |
+| `gps-l1-ca/fix.py` | full GPS receiver: ephemeris -> ECEF satellite positions -> position solve (57 m rms fix from a 90 s capture, 7 SVs, patch antenna in the attic) |
 | `gps-l1-ca/scint.py` | ionospheric scintillation (S4 + phase) from GPS carrier tracking |
 | `doppler_wwv.py` | ionospheric Doppler in milli-Hertz from WWV's 10 MHz carrier |
 
