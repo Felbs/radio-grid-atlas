@@ -190,9 +190,12 @@ def observe(minutes, l_deg, b_deg, fs=2.4e6, antenna="Antenna B"):
     nfft = 8192
     f_on, f_off = F_HI, F_HI + 3.0e6
     sdr, st = cw._open_sdr(antenna, fs)
+    # Power the 1420 MHz LNA. Boolean setting: SoapySDRPlay3 reads only the
+    # exact string "false" as off and treats anything else -- "0" included --
+    # as ON, so these literals are load-bearing. Restored in the finally below.
     for key in ("biasT_ctrl", "biasT", "bias_tee"):
         try:
-            sdr.writeSetting(key, "true")     # power the 1420 MHz LNA
+            sdr.writeSetting(key, "true")
         except Exception:
             pass
     acc_on = np.zeros(nfft)
@@ -221,6 +224,13 @@ def observe(minutes, l_deg, b_deg, fs=2.4e6, antenna="Antenna B"):
                 print(f"[hi] {dumps} dumps  line SNR {snr:4.1f}  v {v:+.0f} km/s", flush=True)
                 np.savez(out, abs_f=abs_f, ratio=ratio, l=l_deg, b=b_deg, dumps=dumps)
     finally:
+        # De-power the LNA before releasing the device: whatever gets plugged
+        # into this port next should not meet DC that nothing turned off.
+        for key in ("biasT_ctrl", "biasT", "bias_tee"):
+            try:
+                sdr.writeSetting(key, "false")
+            except Exception:
+                pass
         try:
             sdr.deactivateStream(st); sdr.closeStream(st)
         except Exception:
