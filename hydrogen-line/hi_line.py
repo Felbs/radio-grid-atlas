@@ -213,7 +213,7 @@ def observe(minutes, l_deg, b_deg, fs=2.4e6, antenna="Antenna B"):
             for f, acc in ((f_on, acc_on), (f_off, acc_off)):
                 sdr.setFrequency(SOAPY_SDR_RX, 0, f)
                 time.sleep(0.05)
-                iq = cw._grab(sdr, st, 0.3, fs)
+                iq = cw._grab(sdr, st, 0.3, fs, max_stall_s=30)
                 fr, p = welch_psd(iq, fs, nfft)
                 acc += p
             dumps += 1

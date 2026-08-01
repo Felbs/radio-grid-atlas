@@ -25,7 +25,9 @@ from pathlib import Path
 import numpy as np
 
 HERE = Path(__file__).resolve().parent
-FS = 250_000.0
+FS = 250_000.0  # rate-ok: offline analyzer of archival 250k WWV captures - no
+#                 SDR open here; NEW captures for this tool must be made at
+#                 >=2.048M (law 8/01) and decimated before analysis
 
 
 def carrier_offset(iq, fs, search=2000.0):
