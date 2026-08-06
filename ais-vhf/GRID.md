@@ -19,7 +19,7 @@ the ruler: 9600 bps GMSK, and a slot edge that never drifts off UTC.
 | Slot | **256 bits = 26.6667 ms**, 2250 per minute | one position report fits one slot |
 | Frame | 60 s, phase-locked to **UTC** | every transmitter disciplines itself to GPS time |
 
-## What we measured (300 s, 8:19 AM Monday, roof discone, DC metro near the Potomac)
+## What we measured (300 s, weekday morning, roof discone, inland receive site)
 
 ```
 synthetic self-test: 5/5 CRC-verified recoveries
@@ -81,9 +81,9 @@ Honesty notes:
   about. We got away with it (96 % of candidates decoded) because AIS
   bursts are 27–37 ms, long enough for the loop to behave. Use fixed
   gain anyway.
-- **One vessel in five minutes.** This far up the Potomac on a Monday
-  morning, the "ship grid" is mostly infrastructure talking to
-  itself. Zero ships would also have been an honest result; the
+- **One vessel in five minutes.** At an inland site far from any port,
+  on a weekday morning, the "ship grid" is mostly infrastructure talking
+  to itself. Zero ships would also have been an honest result; the
   SOTDMA contention story needs a busier harbor.
 - **The comb proof is cross-source phase agreement, not a period
   scan.** The AtoN repeats every 4.000 s, so its bursts alone fold
