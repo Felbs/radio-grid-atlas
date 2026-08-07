@@ -58,6 +58,7 @@ Everything here was found the same way:
 | entry | signal | the grid, in one line | status |
 |---|---|---|---|
 | [atsc-8vsb](atsc-8vsb/) | ATSC 1.0 digital TV | 10.762 Msym/s 8-VSB, 832-symbol segments, PN511 field sync every 313 segments, pilot tone | ✅ measured |
+| [atsc-3.0](atsc-3.0/) | ATSC 3.0 / NextGen TV | bootstrap pinned to 6.144 MHz and 4.5 MHz *whatever follows it*: 2048-FFT, 3 kHz spacing, 4 × 500 µs symbols (C520│A2048│B504), Zadoff-Chu root 137 of length 1499 | ✅ measured — root 137 beats its neighbours 5.5×; frame period 247.111 ms with **0.000 ms spread** over 11 gaps; symbol period read off the self-correlation peaks to 2 samples in 3072 |
 | [fm-stereo](fm-stereo/) | Broadcast FM composite | 19 kHz pilot, (L−R) DSB-SC on 38 kHz = 2× pilot, RDS on 57 kHz = 3× pilot | ✅ measured |
 | [rds](rds/) | Radio Data System | 1187.5 bps BPSK on the 57 kHz subcarrier (= 19 kHz × 3; bitrate = 57 k/48) | ✅ measured |
 | [nrsc5-fm-hybrid](nrsc5-fm-hybrid/) | HD Radio (FM IBOC) | OFDM: 2048-FFT @ 744.1875 kHz, 363.373 Hz spacing, tapered 112-sample guard, reference subcarriers every 19th carrying 32-bit DBPSK | ✅ measured |
