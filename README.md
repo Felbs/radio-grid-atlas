@@ -6,6 +6,8 @@ transmitter promises and the receiver counts on. If you can *measure*
 the grid, you can lock to it, equalize against it, and turn its error
 into a live quality dial.
 
+**Project site:** [felbs.software](https://felbs.software) · **Contact:** [E@felbs.software](mailto:E@felbs.software)
+
 This atlas is a collection of grids we have **personally measured off
 the air** with a hobby SDR (SDRplay RSPdx, consumer antennas, a
 suburban rooftop). Every entry contains three things:
