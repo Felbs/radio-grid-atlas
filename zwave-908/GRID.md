@@ -111,6 +111,59 @@ to whom, sequence), the payload is not.
   two tones. Measure the tones on data frames (random bits put the energy
   on the tones themselves); use the beam for the comb spacing.
 
+## Addendum: a device joining a network, measured live
+
+With the thermostat released from its original hub and its owner pressing
+*include* on it, the SDR recorded what a device does to find a hub. Then the
+same thermostat was added to a home-built hub (an ex-Helium hotspot's SX1302
+concentrator running [zwave-sdr](https://github.com/Felbs/zwave-sdr)), with
+every frame on the air recorded.
+
+**What a device in include mode sends** (two attempts, 50 s capture):
+
+| | |
+|---|---|
+| first | one **49.7 ms** burst at **908.42 MHz** — the 9.6 kbit/s R1 channel, for old hubs |
+| then | a **14.3 ms** broadcast on 908.40 MHz at 40 kbit/s, repeated **4×, 4.0 s apart**, then "failed" |
+| frame | **50 bytes**: a 12-byte hub-search envelope (frame type 5) around the node-information frame (`01 01`, three capability bytes, generic 08 = thermostat, specific 06, twenty command classes) |
+| preamble | **~170 bits** (4.3 ms) — longer than the alarm hub's ~90 or a mains device's |
+| Home ID | random, different on every attempt; node ID 0 |
+
+**Why a chip can hear the hub and not the device.** The SX1302's FSK modem,
+once it detects a preamble, waits a fixed number of bit-times for the sync
+pattern — **128 by default**. The alarm hub's frames and our own test
+frames arrive inside that window; the thermostat's 170-bit preamble runs
+past it, the modem gives up, and the start marker arrives to a modem that
+has stopped listening. From a metre away, every attempt failed; with the
+timeout raised to 1023, the first attempt joined. A radio that hears some
+senders and not others is often a timing window, not a sensitivity problem.
+
+**The join, as recorded** (times from the device's last announcement):
+
+| step | frame | gap |
+|---|---|---|
+| hub → device | assign node ID 2 under the hub's Home ID (`01 03`, 7 bytes) | — |
+| device → hub | ACK | 31 ms after the hub's transmission started |
+| hub → device 2 | request node information (`01 02`) | |
+| device 2 → hub | node-information frame, now under the hub's Home ID | 31 ms |
+
+**Waking a sleeping device.** The thermostat is a "frequently listening"
+battery device: it wakes for a moment every second. To reach it the hub
+sends the 1.11 s beam measured earlier (`0x55, node, hash`), and the hash
+byte depends on the network's Home ID in a way one or two samples do not
+pin down (94 CRC-8 variants fit the first). Trying each value with a beam
+and a request found it on the third try; the device then answered every
+request within ~31 ms. Two beams back-to-back lose the reply — leave the
+device a few seconds.
+
+**Reports without asking.** With the hub written into the device's
+"lifeline" association group, a button press at the thermostat produced a
+setpoint report on its own (`43 03 01 2A 02 B2` = 69.0 °F), and a mode
+change produced `40 03 01`; both acknowledged by the hub within the window
+measured above. Over the air the node-information frame carries **no
+basic-device-class byte** — capabilities, generic, specific, command
+classes — unlike the serial-API form that controller software sees.
+
 ## Reproduce it
 
 ```
