@@ -211,7 +211,7 @@ def main():
     ap.add_argument("--ref433")
     ap.add_argument("--ref915")
     ap.add_argument("--png")
-    ap.add_argument("--lora-log", help="JSONL from the LoRa-card receiver (helium-upcycle-wx915): one verified frame per line with a 't' timestamp; cadence of station B is measured from it")
+    ap.add_argument("--lora-log", help="JSONL from the LoRa-card receiver (github.com/Felbs/helium-upcycle, docs/08 + weather/): one verified frame per line with a 't' timestamp; cadence of station B is measured from it")
     a = ap.parse_args()
     fs = a.fs
     rng = np.random.default_rng(3)

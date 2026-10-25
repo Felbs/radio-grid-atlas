@@ -37,8 +37,8 @@ over 1,340 bits, so the transmitter's RC oscillator is good enough.
 
 Station A: RSPdx, 433.92 MHz, 250 kS/s, 600 s, discone, fixed gain.
 Station B: the same SDR at 915.03 MHz, 70 s, and a RAK5146 LoRa
-concentrator on an attic antenna running for 2.9 h (see
-[helium-upcycle-wx915](../helium-upcycle-wx915/)).
+concentrator on an attic antenna running for 2.9 h (a retired Helium
+hotspot; the receiver recipe is [helium-upcycle, chapter 8](https://github.com/Felbs/helium-upcycle/blob/master/docs/08-weather-station-receiver.md)).
 
 ```
 synthetic self-test: 6/6 frames verified bit-exact (3 per station, random carrier offsets, 20 dB SNR)
@@ -140,7 +140,7 @@ python measure.py --iq433 wx433.cs16 [--iq915 wx915.cs16] --fs 250000 \
 Station A: tune 433.92 MHz, 250 kS/s, fixed gain, 10 minutes catches 20
 bursts. Referee: `rtl_433 -r cap.cs16 -s 250k -f 433.92M -R 215 -F
 json:rtl433_433.jsonl`. Station B: a receiver with a good antenna; the
-LoRa-card recipe is in the helium-upcycle entry.
+LoRa-card recipe is [helium-upcycle, chapter 8](https://github.com/Felbs/helium-upcycle/blob/master/docs/08-weather-station-receiver.md).
 
 **Privacy:** IDs are masked to two digits and no readings are printed.
 One of these stations is a neighbour's; nothing here says where either
